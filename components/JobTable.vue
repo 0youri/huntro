@@ -2,28 +2,20 @@
   <div class="flex flex-col flex-1 w-full">
     <div class="flex px-5 py-3.5 border-b border-(--ui-border-accented) space-x-4">
       <UInput v-model="globalFilter" class="max-w-sm" placeholder="Filter..." />
-      <UButton label="Add job" color="success" variant="subtle" @click="modalAddJobState = true" />
-      <ModalAddJob
-        v-model:open="modalAddJobState"
-        :newJob="newJob"
-        :status-items="statusItems"
-        @submit="addJob"
+      <UButton label="Add job" color="success" variant="subtle" @click="openAddJobModal" />
+      <JobModal
+        v-model:open="jobModal"
+        :job="currentJob"
+        :isEdit="isEditMode"
+        @submit="isEditMode ? updateJob(currentJob) : addJob(currentJob)"
       />
-
-      <ModalEditJob
-        v-model:open="modalEditJobState"
-        :job="selectedJob"
-        :status-items="statusItems"
-        @submit="updateJob"
-      />
-      
     </div>
 
     <UTable
       ref="table"
       v-model:global-filter="globalFilter"
       v-model:sorting="sorting"
-      :data="data"
+      :data="jobs"
       :columns="columns"
     />
 
@@ -32,112 +24,31 @@
 
 <script setup lang="ts">
   import { h, resolveComponent, ref } from 'vue'
-  import type { TableColumn, FormError, SelectItem, ChipProps } from '@nuxt/ui'
-  import { DateFormatter, getLocalTimeZone, fromDate } from '@internationalized/date'
+  import type { TableColumn } from '@nuxt/ui'
+  import { getLocalTimeZone, fromDate } from '@internationalized/date'
   import type { Row } from '@tanstack/vue-table'
+  import type { Job } from '~/types/job'
+  import { useJobStore } from '~/stores/job'
 
-  const UBadge = resolveComponent('UBadge')
+  const user = useSupabaseUser()
+
   const UInput = resolveComponent('UInput')
   const USelect = resolveComponent('USelect')
   const ULink = resolveComponent('ULink')
   const UButton = resolveComponent('UButton')
   const UDropdownMenu = resolveComponent('UDropdownMenu')
+  const { fetchJobs, addJob, deleteJob, updateJob } = useJobStore();
+  const { jobs } = storeToRefs(useJobStore());
 
-  const modalAddJobState = ref(false)
-  const modalEditJobState = ref(false)
-  const selectedJob = ref<Job | null>(null)
 
-  const newJob = reactive({
-    title: '',
-    company: '',
-    status: 'Sent',
-    link: '',
-    applied_at: shallowRef(fromDate(new Date(), getLocalTimeZone())),
-    notes: ''
+  onMounted( async () => {
+    fetchJobs()
   })
 
-  type Job = {
-    id: number
-    title: string
-    company: string
-    status: string
-    link: string
-    applied_at: Date
-    notes: string
-  }
-
-  const statusItems = ref([
-    {
-      label: 'Sent',
-      value: 'Sent',
-      chip: { color: 'info' }
-    },
-    {
-      label: 'Interview',
-      value: 'Interview',
-      chip: { color: 'warning' }
-    },
-    {
-      label: 'Rejected',
-      value: 'Rejected',
-      chip: { color: 'error' }
-    },
-    {
-      label: 'Accepted',
-      value: 'Accepted',
-      chip: { color: 'success' }
-    }
-  ] satisfies SelectItem[])
-
-  function getChip(value: string) {
-    return statusItems.value.find(statusItems => statusItems.value === value)?.chip
-  }
-  const data = ref<Job[]>([
-    {
-      id: 1,
-      title: 'Frontend Developer',
-      company: 'Google',
-      status: 'Sent',
-      link: 'https://careers.google.com/jobs/12345',
-      applied_at: new Date('2024-03-15'),
-      notes: 'Waiting for reply.'
-    },
-  ])
-
-  const validateJob = (state: any): FormError[] => {
-    const errors = []
-    if (!state.title) errors.push({ name: 'title', message: ' ' })
-    if (!state.company) errors.push({ name: 'company', message: ' ' })
-    return errors
-  }
-
-  const addJob = () => {
-    const tempNewJob: Job = {
-      id: Date.now(),
-      title: newJob.title,
-      company: newJob.company,
-      status: newJob.status,
-      link: newJob.link,
-      applied_at: newJob.applied_at.toDate(),
-      notes: newJob.notes
-    }
-    data.value = [...data.value, tempNewJob]
-    modalAddJobState.value = false
-  }
-
-  const updateJob = () => {
-    if (!selectedJob.value) return
-    const index = data.value.findIndex(job => job.id === selectedJob.value!.id)
-    if (index !== -1) {
-      data.value[index] = { 
-        ...selectedJob.value,
-        applied_at: selectedJob.value.applied_at.toDate()
-      }
-      data.value = [...data.value]
-    }
-    modalEditJobState.value = false
-  }
-
+  const globalFilter = ref('')
+  const jobModal = ref(false)
+  const isEditMode = ref(false)
+  const currentJob = ref<Job>(emptyJob())
 
   const sorting = ref([
     {
@@ -154,6 +65,10 @@
     {
       accessorKey: 'company',
       header: 'Company'
+    },
+    {
+      accessorKey: 'location',
+      header: 'Location'
     },
     {
       accessorKey: 'status',
@@ -189,6 +104,7 @@
           modelValue: row.original.status,
           'onUpdate:modelValue': (value: string) => {
             row.original.status = value
+            updateJob(row.original)
           },
           items: statusItems,
           valueKey: 'value',
@@ -210,7 +126,7 @@
       accessorKey: 'applied_at',
       header: 'Applied At',
       cell: ({ row }) => {
-        const date = new Date(row.getValue('applied_at'))
+        const date: Date = row.getValue('applied_at')
         const day = String(date.getDate()).padStart(2, '0')
         const month = String(date.getMonth() + 1).padStart(2, '0')
         const year = date.getFullYear()
@@ -228,6 +144,7 @@
           color: 'neutral',
           'onUpdate:modelValue': (value: string) => {
             row.original.notes = value
+            updateJob(row.original)
           }
         })
       }
@@ -284,19 +201,14 @@
     }
 
   ]
+
   function getRowItems(row: Row<Job>) {
     return [
       {
         label: 'Edit',
         icon: 'i-lucide-edit',
         onSelect: () => {
-          const appliedAtDate = new Date(row.original.applied_at)
-          selectedJob.value = { 
-            ...row.original,
-            applied_at: shallowRef(fromDate(appliedAtDate, getLocalTimeZone()))
-          }
-
-          modalEditJobState.value = true
+          openEditJobModal(row.original)
         }
       },
       {
@@ -310,13 +222,31 @@
     ]
   }
     
-  function deleteJob(id: number) {
-    data.value = data.value.filter(job => job.id !== id)
+  function emptyJob(): Job {
+    const today = fromDate(new Date(), getLocalTimeZone()).toDate()
+    return {
+      id: Date.now(),
+      title: '',
+      company: '',
+      location: '',
+      link: '',
+      notes: '',
+      applied_at: today,
+      status: 'Sent',
+      user_id: user.value.id
+    }
   }
-  const globalFilter = ref('')
 
-  const df = new DateFormatter('fr-FR', {
-    dateStyle: 'short'
-  })
+  function openAddJobModal() {
+    currentJob.value = emptyJob()
+    isEditMode.value = false
+    jobModal.value = true
+  }
 
+  function openEditJobModal(job: Job) {
+    currentJob.value = job
+    isEditMode.value = true
+    jobModal.value = true
+  }
+  
 </script>

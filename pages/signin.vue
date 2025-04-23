@@ -42,8 +42,8 @@
 
   onMounted(async () => {
     const { data, error } = await supabase.auth.getSession()
-    console.log('Manual session:', data)
   })
+  
   const signIn = async () => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: String(state.email),
