@@ -20,6 +20,8 @@
     "@pinia/nuxt": "^0.10.1",
     "@tailwindcss/vite": "^4.0.17",
     "@unhead/vue": "^2.0.2",
+    "cheerio": "^1.0.0",
+    "groq-sdk": "^0.20.1",
     "nuxt": "^3.16.1",
     "pinia": "^3.0.1",
     "tailwindcss": "^4.0.17",

@@ -5,6 +5,7 @@
     @update:open="$emit('update:open', $event)"
   >
     <template #body>
+      
       <UForm :validate="validateJob" :state="job" @submit="$emit('submit'); $emit('update:open', false)">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <UFormField name="title" required>
@@ -99,7 +100,7 @@
 
 <script setup lang="ts">
   import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date'
-  import type { FormError, SelectItem, ChipProps } from '@nuxt/ui'
+  import type { FormError, SelectItem, ChipProps, TabsItem } from '@nuxt/ui'
   import type { Job } from '~/types/job'
 
   const props = defineProps<{
