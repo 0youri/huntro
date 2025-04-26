@@ -15,19 +15,24 @@ export const useJobStore = defineStore('jobStore', () => {
     title: string
     company: string
     location: string
+    link: string
   }>(null)
+  const errorExtractedJob = ref<string | null>(null)
+
   const loading = ref(false)
-  const error = ref<string | null>(null)
   const generateGroqPrompt = (html: string) => `
-    You are an AI assistant that extracts structured data from job offer pages.
+    You are an AI assistant that extracts job offer information from HTML.
 
-    From the HTML content below, extract only the following and return them in a compact JSON format:
+    From the content below, extract:
+    - Title: the exact job title (remove location or extra info if present)
+    - Company: the company name only
+    - Location: the city name only (if none is found and the job is remote, output "Remote")
 
-    - "title": The exact job title (remove location or extra info if present).
-    - "company": The company name only.
-    - "location": Only the city name. If no city is specified and the offer mentions "remote" or "full remote", return "Remote".
+    Return the result in the following exact format:
 
-    Only return a valid JSON object with keys: "title", "company", and "location". Do not include any extra text, explanations, or Markdown.
+    <Title>:<Company>:<Location>
+
+    Only output the string — no JSON, no Markdown, no explanations.
 
     HTML:
     ${html.slice(0, 8000)}
@@ -109,13 +114,17 @@ export const useJobStore = defineStore('jobStore', () => {
 
   async function extractJobInfoFromUrl(url: string) {
     loading.value = true
-    error.value = null
+    errorExtractedJob.value = null
     extractedJob.value = null
-
     if (url.includes('linkedin.com')) {
-      throw new Error('LinkedIn links are not supported. Please use other job boards.')
-    }
-    
+      errorExtractedJob.value = 'LinkedIn links are not supported'
+      return
+    } 
+    // else if (url.includes('indeed.com')) {
+    //   errorExtractedJob.value = 'Indeed links are not supported'
+    //   return
+    // }
+
     try {
       // Step 1: Extract relevant data from HTML using Cheerio
       const { data: extractData, error: extractError } = await useFetch('/api/extractRelevantHtml', {
@@ -123,9 +132,10 @@ export const useJobStore = defineStore('jobStore', () => {
       })
 
       if (extractError.value || !extractData.value?.extracted) {
-        throw new Error('Failed to extract relevant HTML content')
+        errorExtractedJob.value = extractError.value?.data.message
+        return
       }
-      // console.log('Extracted data:', extractData.value.extracted)
+
       // Step 2: Send relevant content to Groq for parsing
       const { data: groqData, error: groqError } = await useFetch('/api/groq', {
         method: 'POST',
@@ -133,35 +143,35 @@ export const useJobStore = defineStore('jobStore', () => {
       })
 
       if (groqError.value || !groqData.value?.response) {
-        throw new Error('Failed to extract job info using AI')
+        errorExtractedJob.value = 'Failed to extract job info'
+        return
       }
 
-      let parsed = {}
-      const match = groqData.value.response.match(/```(?:json)?\s*([\s\S]*?)\s*```/)
-      if (match) {
-        parsed = JSON.parse(match[1].trim())
-      } else {
-        try {
-          parsed = JSON.parse(groqData.value.response.trim())
-        } catch (e) {
-          throw new Error('Failed to parse Groq response')
-        }
+      const parts = groqData.value.response.trim()
+
+      if (!parts.includes(':') || parts.split(':').length !== 3) {
+        errorExtractedJob.value = 'Failed to extract job info'
+        return
       }
+      const [title, company, location] = parts.split(':')
+
 
       extractedJob.value = {
-        title: parsed.title || '',
-        company: parsed.company || '',
-        location: parsed.location || ''
+        title: title || '',
+        company: company || '',
+        location: location || '',
+        link: url,
       }
     } catch (err: any) {
-      error.value = err.message || 'Unknown error occurred'
+      errorExtractedJob.value = 'Failed to extract job info'
+      return
     } finally {
       loading.value = false
     }
   }
 
   return {
-    jobs, extractedJob,
+    jobs, extractedJob, errorExtractedJob, loading,
     fetchJobs, addJob, deleteJob, updateJob, extractJobInfoFromUrl,
   }
 })

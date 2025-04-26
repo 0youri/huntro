@@ -1,22 +1,32 @@
-import { defineEventHandler, getQuery } from 'h3'
+import { defineEventHandler, getQuery, createError } from 'h3'
 import * as cheerio from 'cheerio'
 
 export default defineEventHandler(async (event) => {
   const { url } = getQuery(event)
 
   if (!url || typeof url !== 'string') {
-    return { error: 'Invalid URL' }
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid URL'
+    })
   }
 
   try {
-    const res = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0'
-      }
+    new URL(url)
+  } catch {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid URL format'
     })
+  }
 
+  try {
+    const apiKey = process.env.SCRAPERAPI_KEY
+    const proxyUrl = `http://api.scraperapi.com/?api_key=${apiKey}&url=${encodeURIComponent(url)}`
+
+    const res = await fetch(proxyUrl)
     if (!res.ok) {
-      return { error: `Failed to fetch page: ${res.status}` }
+      throw new Error(`Failed to fetch page: ${res.statusText}`)
     }
 
     const html = await res.text()
@@ -46,6 +56,10 @@ export default defineEventHandler(async (event) => {
 
     return { extracted: trimmed }
   } catch (err) {
-    return { error: 'Error parsing or fetching URL', details: err }
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Error parsing or fetching URL',
+      data: err
+    })
   }
 })

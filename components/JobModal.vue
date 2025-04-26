@@ -5,11 +5,35 @@
     @update:open="$emit('update:open', $event)"
   >
     <template #body>
-      
-      <UForm :validate="validateJob" :state="job" @submit="$emit('submit'); $emit('update:open', false)">
+      <div v-if="!isEdit" class="mb-7">
+        <UForm :state="state" @submit="extractJobInfoFromUrl(state.link)" class="flex flex-row gap-5">
+          <UInput
+            v-model="state.link"
+            class="w-2/3"
+            placeholder=""
+            :loading="loading"
+            :ui="{ base: 'peer' }"
+          >
+            <label class="pointer-events-none absolute left-0 -top-2.5 text-(--ui-text-highlighted) text-xs font-medium px-1.5 transition-all">
+              <span class="inline-flex bg-(--ui-bg) px-1">Link to Offer</span>
+            </label>
+          </UInput>
+          <UButton
+            type="submit"
+            class="w-1/3 justify-center"
+            color="neutral"
+            variant="subtle"
+            icon="i-lucide-link"
+            label="Extract job info"
+          />
+        </UForm>
+        <span class="text-sm text-red-400 ml-2">{{ errorExtractedJob }}</span>
+        <USeparator label="OR" />
+      </div>
+      <UForm :validate="validateJob" :state="job" @submit="$emit('submit'); $emit('update:open', false); state.link = ''">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <UFormField name="title" required>
-            <UInput v-model="job.title" class="w-full" placeholder="" :ui="{ base: 'peer' }">
+            <UInput :disabled="loading" v-model="job.title" class="w-full" placeholder="" :ui="{ base: 'peer' }">
               <label class="pointer-events-none absolute left-0 -top-2.5 text-(--ui-text-highlighted) text-xs font-medium px-1.5 transition-all">
                 <span class="inline-flex bg-(--ui-bg) px-1">Job Title</span>
               </label>
@@ -17,7 +41,7 @@
           </UFormField>
 
           <UFormField name="company" required>
-            <UInput v-model="job.company" class="w-full" placeholder="" :ui="{ base: 'peer' }">
+            <UInput :disabled="loading" v-model="job.company" class="w-full" placeholder="" :ui="{ base: 'peer' }">
               <label class="pointer-events-none absolute left-0 -top-2.5 text-(--ui-text-highlighted) text-xs font-medium px-1.5 transition-all">
                 <span class="inline-flex bg-(--ui-bg) px-1">Company</span>
               </label>
@@ -25,7 +49,7 @@
           </UFormField>
 
           <UFormField name="link" required>
-            <UInput v-model="job.link" class="w-full" placeholder="" :ui="{ base: 'peer' }">
+            <UInput :disabled="loading" v-model="job.link" class="w-full" placeholder="" :ui="{ base: 'peer' }">
               <label class="pointer-events-none absolute left-0 -top-2.5 text-(--ui-text-highlighted) text-xs font-medium px-1.5 transition-all">
                 <span class="inline-flex bg-(--ui-bg) px-1">Link to Offer</span>
               </label>
@@ -33,14 +57,14 @@
           </UFormField>
 
           <UFormField name="location" required>
-            <UInput v-model="job.location" class="w-full" placeholder="" :ui="{ base: 'peer' }">
+            <UInput :disabled="loading" v-model="job.location" class="w-full" placeholder="" :ui="{ base: 'peer' }">
               <label class="pointer-events-none absolute left-0 -top-2.5 text-(--ui-text-highlighted) text-xs font-medium px-1.5 transition-all">
                 <span class="inline-flex bg-(--ui-bg) px-1">Location</span>
               </label>
             </UInput>
           </UFormField>
           
-          <UFormField class="col-span-2" name="notes" required>
+          <UFormField :disabled="loading" class="col-span-2" name="notes" required>
             <UInput v-model="job.notes" class="w-full" placeholder="" :ui="{ base: 'peer' }">
               <label class="pointer-events-none absolute left-0 -top-2.5 text-(--ui-text-highlighted) text-xs font-medium px-1.5 transition-all">
                 <span class="inline-flex bg-(--ui-bg) px-1">Notes</span>
@@ -100,9 +124,16 @@
 
 <script setup lang="ts">
   import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date'
-  import type { FormError, SelectItem, ChipProps, TabsItem } from '@nuxt/ui'
+  import type { FormError, SelectItem, ChipProps } from '@nuxt/ui'
   import type { Job } from '~/types/job'
+  import { useJobStore } from '~/stores/job';
 
+  const { extractJobInfoFromUrl } = useJobStore();
+  const { extractedJob, errorExtractedJob, loading } = storeToRefs(useJobStore());
+
+  const state = reactive({
+    link: ''
+  })
   const props = defineProps<{
     open: boolean
     job: Job        
@@ -154,6 +185,14 @@
     ) {
       props.job.applied_at = newDate
     }
+  })
+
+  watch(extractedJob, (newVal) => {
+    if (!newVal) return
+    props.job.title = newVal.title
+    props.job.company = newVal.company
+    props.job.location = newVal.location
+    props.job.link = newVal.link
   })
 
   const emit = defineEmits(['update:open', 'submit'])
