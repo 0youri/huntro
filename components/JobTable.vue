@@ -86,13 +86,13 @@
             chip: { color: 'warning' }
           },
           {
-            label: 'Rejected',
-            value: 'Rejected',
+            label: 'Declined',
+            value: 'Declined',
             chip: { color: 'error' }
           },
           {
-            label: 'Accepted',
-            value: 'Accepted',
+            label: 'Offer',
+            value: 'Offer',
             chip: { color: 'success' }
           }
         ]
