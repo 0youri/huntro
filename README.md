@@ -1,5 +1,7 @@
 # Huntro - Job Application Tracker
 
+![App Screenshot](https://0youri.com/backend/uploads/Screenshot_2025_04_27_at_12_37_12_PM_09f4e5b8ba.png)
+
 **Huntro** is a simple and efficient Job Board to help you track your job applications in one place.
 
 You can easily save, manage, and monitor the progress of your job hunt. Built with Nuxt 3, Supabase, and Groq AI, Huntro provides a clean and fast experience for organizing your job search.
