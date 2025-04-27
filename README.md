@@ -1,75 +1,100 @@
-# Nuxt Minimal Starter
+# Huntro - Job Application Tracker
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+**Huntro** is a simple and efficient Job Board to help you track your job applications in one place.
 
-## Setup
+You can easily save, manage, and monitor the progress of your job hunt. Built with Nuxt 3, Supabase, and Groq AI, Huntro provides a clean and fast experience for organizing your job search.
 
-Make sure to install dependencies:
+---
+
+## 🚀 Features
+
+- Add a job application manually or by providing a job offer URL
+- Automatic extraction of:
+  - Job title
+  - Company name
+  - Location
+- Manage application status (e.g., Sent, Interview, Declined, Offer)
+- Edit and delete applications
+- Notes field for each job
+- Supabase as the backend database
+- Groq API integration for extracting job information
+
+---
+
+## 📚 Tech Stack
+
+- **Nuxt 3** (Vue 3 Framework)
+- **Pinia** for state management
+- **Supabase** (PostgreSQL database and auth)
+- **Groq API** (LLM-powered HTML parsing)
+- **Nuxt UI & Tailwind CSS** for styling
+- **Cheerio & ScraperAPI** for HTML extraction
+
+---
+
+## 🚧 Installation
+
+1. Clone the repo:
 
 ```bash
-# npm
+git clone https://github.com/yourusername/huntro.git
+cd huntro
+```
+
+2. Install dependencies:
+
+```bash
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+3. Set up environment variables:
 
-Start the development server on `http://localhost:3000`:
+Create a `.env` file and configure:
+
+```env
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+GROQ_API_KEY=your_groq_api_key
+SCRAPERAPI_KEY=your_scraperapi_key
+```
+
+4. Run the app locally:
 
 ```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+---
 
-Build the application for production:
+## 🌐 Deployment
 
-```bash
-# npm
-npm run build
+**Deploy to Netlify:**
 
-# pnpm
-pnpm build
+- **Build command:** `npm run build`
+- **Publish directory:** `dist`
 
-# yarn
-yarn build
+Make sure your `nuxt.config.ts` includes:
 
-# bun
-bun run build
+```ts
+export default defineNuxtConfig({
+  nitro: {
+    preset: 'netlify'
+  }
+})
 ```
 
-Locally preview production build:
+---
 
-```bash
-# npm
-npm run preview
+## 🛠️ API Routes
 
-# pnpm
-pnpm preview
+- `/api/extractRelevantHtml`: Scrapes and extracts the important HTML parts (title, meta, etc.)
+- `/api/groq`: Sends a prompt to Groq API to extract structured job information
 
-# yarn
-yarn preview
+---
 
-# bun
-bun run preview
-```
+## 👤 Author
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- [0youri](https://github.com/0youri)
+
+Feel free to contribute, suggest improvements, or fork the project! 🚀
+
