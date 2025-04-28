@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col flex-1 w-full">
-    <div class="flex px-5 py-3.5 border-b border-(--ui-border-accented) space-x-4">
+    <div class="flex px-2.5 lg:px-12.5 py-3.5 border-b border-(--ui-border-accented) space-x-4">
       <UInput v-model="globalFilter" class="max-w-sm" placeholder="Filter..." />
       <UButton label="Add job" color="success" variant="subtle" @click="openAddJobModal" />
       <JobModal
@@ -17,6 +17,7 @@
       v-model:sorting="sorting"
       :data="jobs"
       :columns="columns"
+      class="lg:px-10"
     />
 
   </div>

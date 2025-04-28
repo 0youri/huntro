@@ -20,7 +20,7 @@
           </UInput>
           <UButton
             type="submit"
-            class="w-1/3 justify-center"
+            class="w-1/3 justify-center cursor-pointer"
             color="neutral"
             variant="subtle"
             icon="i-lucide-link"
@@ -77,7 +77,7 @@
           <UFormField name="date">
             <UPopover class="w-36">
               <UButton
-                class="justify-center"
+                class="justify-center cursor-pointer"
                 :class="!calendarDate ? 'border-red-500 border' : ''"
                 color="neutral"
                 variant="subtle"
@@ -97,7 +97,7 @@
               :items="statusItems"
               value-key="value"
               placeholder="Select status"
-              class="w-36"
+              class="w-36 cursor-pointer"
             >
               <template #leading="{ modelValue, ui }">
                 <UChip
@@ -114,8 +114,8 @@
         </div>
 
         <div class="flex gap-2 justify-end mt-5">
-          <UButton label="Cancel" color="neutral" variant="subtle" @click="$emit('update:open', false)" />
-          <UButton type="submit" :label="isEdit ? 'Save changes' : 'Add job'" color="success" />
+          <UButton label="Cancel" color="neutral" variant="subtle" @click="$emit('update:open', false)" class="cursor-pointer" />
+          <UButton type="submit" :label="isEdit ? 'Save changes' : 'Add job'" color="success" class="cursor-pointer" />
         </div>
       </UForm>
     </template>

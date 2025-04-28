@@ -1,5 +1,5 @@
 <template>
-  <div class="py-6">
+  <div class="min-h-dvh">
     <JobTable />
   </div>
 </template>

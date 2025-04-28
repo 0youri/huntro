@@ -1,5 +1,8 @@
 <template>
-  <header class="pt-5 pb-3 border-b dark:border-gray-800">
+  <header class="
+    pt-5 pb-3 top-0 sticky border-b-2 backdrop-blur-xs z-10 xl:px-52
+    bg-white/25 dark:bg-slate-900/25 border-slate-200 dark:border-slate-800
+  ">
     <div class="flex items-center justify-between px-5">
       <div class="flex-0 md:flex-1"></div>
       <NuxtLink to="/" class="text-2xl font-semibold md:text-center flex-1">Huntro</NuxtLink>
@@ -28,7 +31,7 @@
             color="neutral"
             variant="outline"
             @click="signOut"
-            class="cursor-pointer "
+            class="cursor-pointer"
           >
             Sign out
           </UButton>
