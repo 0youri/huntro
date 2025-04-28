@@ -1,6 +1,10 @@
 # Huntro - Job Application Tracker
 
-![App Screenshot](https://0youri.com/backend/uploads/Screenshot_2025_04_27_at_12_37_12_PM_09f4e5b8ba.png)
+<p align="center">
+  <img src="https://0youri.com/backend/uploads/Screenshot_2025_04_28_at_3_41_37_PM_cc74683174.png" alt="Huntro Home" width="30%" />
+  <img src="https://0youri.com/backend/uploads/Screenshot_2025_04_28_at_3_37_03_PM_8848f6099a.png" alt="Huntro Job Applications" width="30%" />
+  <img src="https://0youri.com/backend/uploads/Screenshot_2025_04_28_at_3_50_47_PM_103f77565f.png" alt="Huntro Job Add" width="30%" />
+</p>
 
 **Huntro** is a simple and efficient Job Board to help you track your job applications in one place.
 
