@@ -13,8 +13,6 @@
       <UFormField label="Password" name="password" required>
         <UInput v-model="state.password" type="password" class="w-full" />
       </UFormField>
-
-      err
       <UButton type="submit" size="lg" class="w-full justify-center" loading-auto>
         Sign in
       </UButton>
