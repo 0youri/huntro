@@ -1,8 +1,10 @@
-# Huntro - Job Application Tracker
+# 🧭 Huntro - Job Application Tracker
 
 **Huntro** is a simple and efficient Job Board to help you track your job applications in one place.
 
 You can easily save, manage, and monitor the progress of your job hunt. Built with Nuxt 3, Supabase, and Groq AI, Huntro provides a clean and fast experience for organizing your job search.
+
+🧪 **Try it now** → [https://huntro.netlify.app/](https://huntro.netlify.app/)
 
 ---
 
@@ -21,33 +23,26 @@ You can easily save, manage, and monitor the progress of your job hunt. Built wi
 
 ---
 
-## 📚 Tech Stack
+## ⚙️ Tech Stack
 
-- **Nuxt 3** (Vue 3 Framework)
-- **Pinia** for state management
-- **Supabase** (PostgreSQL database and auth)
-- **Groq API** (LLM-powered HTML parsing)
-- **Nuxt UI & Tailwind CSS** for styling
-- **Cheerio & ScraperAPI** for HTML extraction
+- **Framework**: [Nuxt 3](https://nuxt.com)
+- **Server**: [Supabase](https://supabase.com)
+- **AI API**: [Groq AI API](https://groq.com)
+- **Language**: [TypeScript](https://www.typescriptlang.org)
+- **Design**: [Nuxt UI](https://ui.nuxt.com) & [TailwindCSS](https://tailwindcss.com)
+- **State Management**: [Pinia](https://pinia.vuejs.org)
+- **Cheerio & ScraperAPI**: [ScraperAPI](https://www.scraperapi.com)
+- **Deployment**: [Netlify](https://www.netlify.com)
 
 ---
 
-## 🚧 Installation
-
-1. Clone the repo:
+## 🛠️ Run Locally
 
 ```bash
-git clone https://github.com/yourusername/huntro.git
+git clone https://github.com/0youri/huntro.git
 cd huntro
-```
-
-2. Install dependencies:
-
-```bash
 npm install
 ```
-
-3. Set up environment variables:
 
 Create a `.env` file and configure:
 
@@ -58,43 +53,8 @@ GROQ_API_KEY=your_groq_api_key
 SCRAPERAPI_KEY=your_scraperapi_key
 ```
 
-4. Run the app locally:
+Then start the dev server:
 
 ```bash
 npm run dev
 ```
-
----
-
-## 🌐 Deployment
-
-**Deploy to Netlify:**
-
-- **Build command:** `npm run build`
-- **Publish directory:** `dist`
-
-Make sure your `nuxt.config.ts` includes:
-
-```ts
-export default defineNuxtConfig({
-  nitro: {
-    preset: 'netlify'
-  }
-})
-```
-
----
-
-## 🛠️ API Routes
-
-- `/api/extractRelevantHtml`: Scrapes and extracts the important HTML parts (title, meta, etc.)
-- `/api/groq`: Sends a prompt to Groq API to extract structured job information
-
----
-
-## 👤 Author
-
-- [0youri](https://github.com/0youri)
-
-Feel free to contribute, suggest improvements, or fork the project! 🚀
-
